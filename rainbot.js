@@ -6,12 +6,13 @@ const database = require('./src/database');
 const WebClient = require('./src/webclient');
 const lib = require('./src/lib');
 
-const Sentry = require('@sentry/node');
-Sentry.init({ dsn: 'https://9957203a0a7e45539766008492892951@sentry.io/5168069' });
+if (config.SENTRY_DSN) {
+    const Sentry = require('@sentry/node');
+    Sentry.init({ dsn: config.SENTRY_DSN });
+}
 
-// TODO: Ensure that shiba and rainbot can both use the ! prefix
 // Command Regex
-const cmdReg = /^\s*#([a-zA-z]*)\s*(.*)$/i;
+const cmdReg = new RegExp(`^\s*${config.PREFIX}([a-zA-z]*)\s*(.*)$`, 'i');
 
 // Available Commands
 var commands = ["rain", "rainon", "help", "faq"];
@@ -57,15 +58,15 @@ client.on('msg', function(msg) {
             const channelName = msg.channelName;
             const command = _.trim(cmdMatch[1]);
 
-            // Check if command is a rainbot command
-            if (commands.includes(command)) {
+	        // Check if command is a rainbot command
+		if (commands.includes(command)) {
                 debug('Command matched. Processing...');
 
                 // If command is faq or help, send msg
-                if (command === "faq" || command === "help") return client.doSay('@' + fromUser + ', view help at https://busts.io/faq#rainbot');
+                if (command === "faq" || command === "help") return client.doSay(`@${fromUser}, view help at ${config.WEBSERVER}/faq#rainbot`);
 
                 // Check if arguments exists after command
-                if (!cmdMatch[2]) return client.doSay('@' + fromUser + ', invalid syntax. https://busts.io/faq#rainbot', channelName);
+                if (!cmdMatch[2]) return client.doSay(`@${fromUser}, invalid syntax. ${config.WEBSERVER}/faq#rainbot`, channelName);
 
                 // Covert arguments to array
                 const args = cmdMatch[2].split(' ');
@@ -78,7 +79,7 @@ client.on('msg', function(msg) {
                     debug('Rain command called by ' + fromUser);
 
                     // Validate syntax
-                    if (!lib.isNumber(user) || !lib.isNumber(bits)) return client.doSay('@' + fromUser + ', invalid syntax. https://busts.io/faq#rainbot', channelName);
+                    if (!lib.isNumber(user) || !lib.isNumber(bits)) return client.doSay(`@${fromUser}, view help at ${config.WEBSERVER}/faq#rainbot`, channelName);
 
                     // Get user balance
                     database.getUserBalance(fromUser, function(err, balance) {
@@ -149,7 +150,7 @@ client.on('msg', function(msg) {
                         }
                     })
                 } else if (command === "rainon") {
-                    if (!lib.isNumber(bits)) return client.doSay('@' + fromUser + ', invalid syntax. https://busts.io/faq#rainbot', channelName);
+                    if (!lib.isNumber(bits)) return client.doSay(`@${fromUser}, view help at ${config.WEBSERVER}/faq#rainbot`, channelName);
                     if (!lib.isValidUsername(user) !== false) return client.doSay('@' + fromUser + ', invalid username.', channelName);
 
                     database.checkIfUserExists(user, function(err, exists) {
