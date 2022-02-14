@@ -1,9 +1,13 @@
 # Rain Bot
 ## Table Of Contents
+- [Summary](#summary)
 - [Config](#config)
 - [Commands](#commands)
 - [Setup](#setup)
 - [License](#license)
+
+## Summary
+This is a rain bot for bustabit v1 clones. This allows a user to rain bits on random users, or "donate" bits using the rainon command.
 
 ## Config
 `WEBSERVER`: Chat web server to connect to. This should be a full url, including https:// and excluding any path (/test). In the invalid syntax message, /faq will be added after this variable to direct users to the FAQ.
